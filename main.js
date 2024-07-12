@@ -5,13 +5,16 @@ document.addEventListener("DOMContentLoaded", (event) => {
   const dimensions = gridWidth * gridHeight;
   const gridItemSize = 20;
 
-
   let time = 100;
-  let currentDirection = "right"; 
-  let nextDirection = "right"; 
+  let currentDirection = "right";
+  let nextDirection = "right";
+  let movement = setInterval(snakeMovement, time);
   let score = 0;
   let points = document.getElementById("points");
   points.innerHTML = "Puntuación: " + score;
+
+  let modal = document.getElementById("modalWindow");
+  let reiniciar = document.getElementById("reiniciar");
 
   let eat = new Audio("/sound/eat.wav");
   let die = new Audio("/sound/die.wav");
@@ -29,8 +32,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
   function drawSnake() {
     snake.forEach((pos) => {
       const snakeElement = gameContainer.children[pos];
-      snakeElement.style.width = gridItemSize + "px"; 
-      snakeElement.style.height = gridItemSize + "px"; 
+      snakeElement.style.width = gridItemSize + "px";
+      snakeElement.style.height = gridItemSize + "px";
       snakeElement.classList.add("snake");
     });
   }
@@ -38,8 +41,8 @@ document.addEventListener("DOMContentLoaded", (event) => {
   function clearSnake() {
     snake.forEach((pos) => {
       const snakeElement = gameContainer.children[pos];
-      snakeElement.style.width = ""; 
-      snakeElement.style.height = ""; 
+      snakeElement.style.width = "";
+      snakeElement.style.height = "";
       snakeElement.classList.remove("snake");
     });
   }
@@ -57,18 +60,22 @@ document.addEventListener("DOMContentLoaded", (event) => {
     foodElement.classList.remove("food");
   }
 
+  function startGame() {
+    modal.style.display = "none";
+    score = 0;
+    drawSnake();
+    placeFood();
+  }
+
   // Increases the speed when the snake grows
   function checkSize() {
-    if (score > 30){
+    if (score > 30) {
       time = 30;
-    }
-    else if (score > 20){
+    } else if (score > 20) {
       time = 50;
-    }
-    else if (score > 10) {
+    } else if (score > 10) {
       time = 60;
-    }
-    else if (score > 5) {
+    } else if (score > 5) {
       time = 75;
     }
     clearInterval(movement);
@@ -98,17 +105,20 @@ document.addEventListener("DOMContentLoaded", (event) => {
     if (
       newHeadPosition < 0 ||
       newHeadPosition >= dimensions ||
-      (currentDirection === "left" && newHeadPosition % gridWidth === gridWidth - 1) ||
+      (currentDirection === "left" &&
+        newHeadPosition % gridWidth === gridWidth - 1) ||
       (currentDirection === "right" && newHeadPosition % gridWidth === 0)
     ) {
       die.play();
       clearInterval(movement);
+      modal.style.display = "block";
       return;
     }
 
     if (snake.includes(newHeadPosition)) {
       die.play();
       clearInterval(movement);
+      modal.style.display = "block";
       return;
     }
 
@@ -157,8 +167,5 @@ document.addEventListener("DOMContentLoaded", (event) => {
     },
     true
   );
-
-  drawSnake();
-  placeFood();
-  let movement = setInterval(snakeMovement, time);
+  startGame();
 });
